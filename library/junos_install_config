@@ -302,7 +302,16 @@ def _load_via_netconf(module):
         elif overwrite is False:
             load_args['merge'] = True
         cu.load(**load_args)
-    except (ValueError, ConfigLoadError, Exception) as err:
+
+    except ConfigLoadError as err:
+        if 'error:' in err:
+            msg = "Unable to load config: {0}".format(err)
+            raise err
+        else:
+            msg = "Load warning ignored: {0}".format(err)
+            pass
+        logging.error(msg)
+    except (ValueError, Exception) as err:
         msg = "Unable to load config: {0}".format(err)
         logging.error(msg)
         try:
